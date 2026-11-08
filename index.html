@@ -1,0 +1,1724 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>JILI Money Coming Slot & Wheel</title>
+    
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            user-select: none;
+            -webkit-user-select: none;
+            font-family: 'Segoe UI', Impact, Arial, sans-serif;
+        }
+
+        body {
+            background-color: #0d0101;
+            background-image: 
+                radial-gradient(circle at 50% 20%, #4a1208 0%, #0d0101 75%),
+                repeating-linear-gradient(45deg, rgba(0,0,0,0.3) 0px, rgba(0,0,0,0.3) 10px, transparent 10px, transparent 20px);
+            color: #ffffff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            overflow: hidden;
+        }
+
+        iframe + div, 
+        div[style*="z-index: 2147483647"],
+        a[href*="netlify.com"],
+        div:has(> a[href*="netlify.com"]) {
+            display: none !important;
+            opacity: 0 !important;
+            pointer-events: none !important;
+            visibility: hidden !important;
+        }
+
+        .game-wrapper {
+            width: 100vw;
+            max-width: 380px;
+            height: 96vh;
+            max-height: 720px;
+            background: radial-gradient(circle at center, #2e0808 0%, #080101 100%);
+            border: 3px solid #d4af37;
+            border-radius: 12px;
+            box-shadow: 0 0 25px rgba(212, 175, 55, 0.4), inset 0 0 15px rgba(0,0,0,0.9);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            position: relative;
+            overflow: hidden;
+            padding: 4px;
+            transition: border-color 0.3s ease;
+        }
+
+        .intro-screen-1 {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at center, #660000 0%, #1a0000 100%);
+            z-index: 999;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            align-items: center;
+            padding: 25px 15px;
+            text-align: center;
+            transition: opacity 0.4s ease;
+        }
+
+        .intro-screen-1.hidden {
+            opacity: 0 !important;
+            pointer-events: none !important;
+            display: none !important;
+        }
+
+        .intro-logo-title {
+            font-size: 28px;
+            font-style: italic;
+            font-weight: 900;
+            text-transform: uppercase;
+            background: linear-gradient(180deg, #ffffff 0%, #ff3333 50%, #990000 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            -webkit-text-stroke: 1px #ffd700;
+            filter: drop-shadow(0 3px 6px #000);
+            margin-top: 10px;
+        }
+
+        .intro-volatility {
+            font-size: 11px;
+            color: #ffd700;
+            font-weight: bold;
+            margin-top: 4px;
+        }
+
+        .intro-center-banner {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .intro-huge-text {
+            font-size: 38px;
+            font-weight: 900;
+            color: #ffea00;
+            text-shadow: 0 0 15px #ff6600, 0 3px 5px #000;
+            font-style: italic;
+        }
+
+        .intro-sub-desc {
+            font-size: 11px;
+            color: #ffcccc;
+            font-weight: bold;
+        }
+
+        .continue-btn {
+            width: 80%;
+            max-width: 240px;
+            padding: 12px;
+            background: linear-gradient(180deg, #33cc33 0%, #008000 100%);
+            border: 2px solid #ffff66;
+            border-radius: 25px;
+            color: #ffffff;
+            font-size: 16px;
+            font-weight: 900;
+            text-transform: uppercase;
+            cursor: pointer;
+            box-shadow: 0 0 15px rgba(0, 255, 0, 0.7);
+            letter-spacing: 1px;
+            position: relative;
+            z-index: 1000;
+            pointer-events: auto;
+        }
+
+        .continue-btn:active {
+            transform: scale(0.95);
+        }
+
+        .intro-footer-logos {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            font-size: 10px;
+            color: #aaa;
+            font-weight: bold;
+        }
+
+        .intro-screen-2 {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            z-index: 998;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: opacity 0.4s ease;
+        }
+
+        .intro-screen-2.hidden {
+            opacity: 0 !important;
+            pointer-events: none !important;
+            display: none !important;
+        }
+
+        .play-btn-main {
+            width: 180px;
+            height: 55px;
+            background: linear-gradient(180deg, #ff9900 0%, #cc5500 50%, #802200 100%);
+            border: 3px solid #ffff66;
+            border-radius: 10px;
+            color: #ffffff;
+            font-size: 22px;
+            font-weight: 900;
+            text-transform: uppercase;
+            cursor: pointer;
+            box-shadow: 0 0 25px rgba(255, 150, 0, 0.9), inset 0 0 10px #ffff00;
+            letter-spacing: 2px;
+            text-shadow: 0 2px 4px #000;
+            position: relative;
+            z-index: 1000;
+            pointer-events: auto;
+        }
+
+        .top-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 4px 8px;
+            background: linear-gradient(180deg, rgba(0,0,0,0.85) 0%, rgba(20,5,5,0.3) 100%);
+            z-index: 10;
+        }
+
+        .brand-logo {
+            font-size: 12px;
+            font-weight: 900;
+            color: #ffe600;
+            background: linear-gradient(180deg, #d4af37 0%, #fff2a3 50%, #aa771c 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-transform: uppercase;
+            border: 1px solid #d4af37;
+            padding: 1px 5px;
+            border-radius: 3px;
+        }
+
+        .jackpot-badge {
+            background: radial-gradient(circle, #ff0000 0%, #800000 100%);
+            border: 1px solid #ffd700;
+            border-radius: 15px;
+            padding: 1px 8px;
+            font-size: 9px;
+            font-weight: bold;
+            color: #fff;
+            box-shadow: 0 0 8px rgba(255,0,0,0.7);
+        }
+
+        .arch-section {
+            position: relative;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 2px;
+        }
+
+        .boxes-top-wrapper {
+            position: relative;
+            z-index: 8;
+            width: 100%;
+            max-width: 320px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            margin-bottom: -12px;
+            padding: 0 8px;
+        }
+
+        .boxes-stack-container {
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+        }
+
+        .small-square-box {
+            width: 110px;
+            height: 24px;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 9px;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border: 1.5px solid #ffd700;
+            box-shadow: 0 0 8px rgba(255, 215, 0, 0.6), inset 0 0 4px rgba(255, 255, 255, 0.5);
+        }
+
+        .box-item-1 {
+            background: linear-gradient(180deg, #ffd700 0%, #b8860b 50%, #5c4000 100%);
+            color: #000;
+        }
+
+        .box-item-2 {
+            background: linear-gradient(180deg, #ff3333 0%, #990000 60%, #4a0000 100%);
+            color: #fff;
+            border-color: #ffcc00;
+        }
+
+        .right-multiplier-box {
+            width: 58px;
+            height: 52px;
+            background: radial-gradient(circle at 50% 50%, #5c4000 0%, #1a0f01 100%);
+            border: 2px solid #ffd700;
+            border-radius: 8px;
+            box-shadow: 0 0 12px rgba(255, 215, 0, 0.8), inset 0 0 6px rgba(255, 255, 255, 0.6);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .right-multiplier-box .symbol-bonus-badge {
+            width: 44px;
+            height: 44px;
+            font-size: 13px;
+            transition: transform 0.05s linear;
+        }
+
+        .particle-canvas-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 20;
+        }
+
+        .gold-arch-frame {
+            width: 98%;
+            max-width: 340px;
+            height: 270px;
+            background: radial-gradient(circle at 50% 50%, #006631 0%, #002e15 80%);
+            border: 5px solid #e0be53;
+            border-bottom: 3px solid #8a641a;
+            border-radius: 170px 170px 10px 10px;
+            box-shadow: 0 0 15px rgba(212, 175, 55, 0.5), inset 0 0 20px rgba(0,0,0,0.85);
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            padding-top: 8px;
+        }
+
+        .wheel-wrapper {
+            position: relative;
+            width: 240px;
+            height: 240px;
+        }
+
+        #wheelCanvas {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.8), inset 0 0 15px rgba(0,0,0,0.9);
+        }
+
+        .wheel-pointer {
+            position: absolute;
+            top: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 30px;
+            height: 30px;
+            z-index: 5;
+            filter: drop-shadow(0 3px 5px rgba(0,0,0,0.9));
+        }
+
+        .title-logo-container {
+            position: absolute;
+            bottom: -12px;
+            z-index: 6;
+            text-align: center;
+            width: 100%;
+        }
+
+        .title-logo {
+            font-size: 22px;
+            font-weight: 900;
+            font-style: italic;
+            text-transform: uppercase;
+            background: linear-gradient(180deg, #ffffff 0%, #ff4d4d 40%, #990000 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            -webkit-text-stroke: 1px #ffd700;
+            filter: drop-shadow(0 3px 5px rgba(0,0,0,0.9));
+            line-height: 1;
+        }
+
+        .win-center-popup {
+            position: absolute;
+            bottom: -8px;
+            z-index: 25;
+            background: radial-gradient(circle, #ffe600 0%, #ff9900 60%, #b35900 100%);
+            border: 2.5px solid #ffffff;
+            border-radius: 12px;
+            padding: 4px 18px;
+            box-shadow: 0 0 25px #ffd700, inset 0 0 10px #ffffff;
+            transform: scale(0);
+            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.27);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .win-center-popup.active {
+            transform: scale(1.25);
+        }
+
+        .win-center-text {
+            font-size: 22px;
+            font-weight: 900;
+            color: #ffffff;
+            text-shadow: 0 2px 4px #000000, 0 0 10px #ff3300;
+            letter-spacing: 1px;
+        }
+
+        .unlock-panel {
+            width: 98%;
+            max-width: 340px;
+            margin-top: 8px;
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .unlock-bar {
+            background: linear-gradient(90deg, #4a0000 0%, #801010 50%, #4a0000 100%);
+            border: 1px solid #d4af37;
+            border-radius: 4px;
+            padding: 2px 8px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 10px;
+            font-weight: bold;
+            color: #fff;
+        }
+
+        .unlock-bar.unlocked {
+            background: linear-gradient(90deg, #003311 0%, #006622 50%, #003311 100%);
+            border-color: #00ff66;
+        }
+
+        .unlock-tag {
+            color: #ffd700;
+            font-weight: 900;
+        }
+
+        .reels-section {
+            width: 98%;
+            max-width: 340px;
+            margin: 4px auto;
+            background: linear-gradient(180deg, #d4af37 0%, #8a641a 100%);
+            border: 2px solid #ffe875;
+            border-radius: 8px;
+            padding: 3px;
+            position: relative;
+            box-shadow: 0 0 12px rgba(255, 215, 0, 0.4);
+        }
+
+        .reels-frame {
+            display: flex;
+            gap: 2px;
+            background: #004d25;
+            border-radius: 6px;
+            padding: 3px;
+            overflow: hidden;
+            border: 1.5px solid #d4af37;
+            position: relative;
+        }
+
+        .payline-overlay {
+            position: absolute;
+            top: 50%;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #ff0000, #ffff00, #ff0000, transparent);
+            transform: translateY(-50%);
+            z-index: 4;
+            pointer-events: none;
+            opacity: 0.8;
+        }
+
+        .reel-column {
+            flex: 1;
+            height: 70px;
+            background: linear-gradient(180deg, #007337 0%, #005c2c 50%, #007337 100%);
+            border-radius: 4px;
+            border: 1px solid #00994d;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .reel-column.bonus-reel {
+            background: linear-gradient(180deg, #3d2b00 0%, #664d00 50%, #3d2b00 100%);
+            border: 1px solid #ffd700;
+            box-shadow: inset 0 0 8px rgba(255,215,0,0.5);
+        }
+
+        .reel-strip {
+            display: flex;
+            flex-direction: column;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            transition: transform 0.1s linear;
+        }
+
+        .symbol-cell {
+            height: 70px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 24px;
+            font-weight: 900;
+        }
+
+        .symbol-num {
+            font-size: 34px;
+            font-weight: 900;
+            letter-spacing: -1px;
+            background: linear-gradient(180deg, #ffffff 0%, #fff066 35%, #ffd700 70%, #ffaa00 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.7));
+        }
+
+        .symbol-bonus-badge {
+            width: 52px;
+            height: 52px;
+            border-radius: 50%;
+            background: radial-gradient(circle at 35% 35%, #ffd700 0%, #b35900 45%, #800000 80%, #4a0000 100%);
+            border: 2.5px solid #ffea80;
+            box-shadow: 0 0 14px rgba(255, 165, 0, 0.9), inset 0 2px 4px rgba(255, 255, 255, 0.7);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 15px;
+            font-weight: 900;
+            color: #ffffff;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.9);
+        }
+
+        .symbol-bonus-badge.b-scatter {
+            background: radial-gradient(circle at 35% 35%, #66ffff 0%, #0088cc 50%, #003366 85%, #001a33 100%);
+            border-color: #b3ffff;
+            box-shadow: 0 0 14px rgba(0, 255, 255, 0.9);
+            font-size: 10px;
+            text-align: center;
+        }
+
+        .reel-lock-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.75);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 5;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .reel-lock-overlay.locked {
+            opacity: 1;
+        }
+
+        .gold-lock-icon {
+            width: 38px;
+            height: 42px;
+            background: linear-gradient(180deg, #ffe875 0%, #d4af37 50%, #997314 100%);
+            border: 2px solid #ffffff;
+            border-radius: 6px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .jili-dashboard {
+            background: radial-gradient(circle at 50% 100%, #1a0802 0%, #050101 100%);
+            border-top: 1px solid #d4af37;
+            padding: 6px 10px 8px 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            position: relative;
+        }
+
+        .win-corner-box-left, .win-corner-box-right {
+            position: absolute;
+            top: 4px;
+            width: 18px;
+            height: 22px;
+            background: radial-gradient(circle, #ffd700 0%, #b8860b 100%);
+            border: 1px solid #ffffff;
+            border-radius: 3px;
+            box-shadow: 0 0 8px #ffd700;
+            z-index: 12;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+        }
+        .win-corner-box-left { left: 8px; }
+        .win-corner-box-right { right: 8px; }
+
+        .win-display-bar {
+            text-align: center;
+            font-size: 13px;
+            font-weight: 900;
+            background: rgba(0, 0, 0, 0.85);
+            border: 1px solid #d4af37;
+            border-radius: 4px;
+            padding: 2px 0;
+            color: #ffd700;
+            margin: 0 20px;
+        }
+
+        .win-amount-num {
+            color: #ffffff;
+            font-size: 16px;
+            margin-left: 6px;
+            font-weight: 900;
+        }
+
+        .dashboard-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 2px;
+        }
+
+        .dash-btn-round {
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            background: radial-gradient(circle, #5e4111 0%, #1f1302 100%);
+            border: 1px solid #d4af37;
+            color: #ffd700;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            font-size: 12px;
+        }
+
+        .bet-button-box {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            cursor: pointer;
+        }
+
+        .bet-icon-round {
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            background: radial-gradient(circle, #8a621a 0%, #301f02 100%);
+            border: 1.5px solid #ffe600;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-weight: bold;
+            font-size: 12px;
+            color: #fff;
+        }
+
+        .bet-label-sub {
+            font-size: 9px;
+            color: #ffd700;
+            margin-top: 1px;
+            font-weight: bold;
+        }
+
+        .spin-section-box {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 2px;
+        }
+
+        .jili-spin-btn {
+            width: 55px;
+            height: 55px;
+            border-radius: 50%;
+            background: radial-gradient(circle at 35% 35%, #00ff66 0%, #008033 60%, #003311 100%);
+            border: 2.5px solid #ffd700;
+            box-shadow: 0 0 12px rgba(0, 255, 102, 0.7);
+            color: #ffffff;
+            font-size: 11px;
+            font-weight: 900;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+        }
+
+        .jili-spin-btn:disabled {
+            filter: grayscale(0.8);
+            cursor: not-allowed;
+        }
+
+        .balance-under-spin {
+            font-size: 10px;
+            font-weight: 900;
+            background: radial-gradient(circle, #150505 0%, #050101 100%);
+            padding: 2px 10px;
+            border-radius: 8px;
+            border: 1.5px solid #d4af37;
+            text-align: center;
+            color: #ffd700;
+        }
+
+        .bottom-info-line {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 9px;
+            color: #8c7348;
+            padding: 0 2px;
+            font-weight: bold;
+            margin-top: 2px;
+        }
+
+        .flying-multiplier-badge {
+            position: absolute;
+            z-index: 100;
+            pointer-events: none;
+            transition: all 1.3s cubic-bezier(0.25, 1, 0.5, 1);
+        }
+
+        .flying-money-badge {
+            position: absolute;
+            z-index: 105;
+            pointer-events: none;
+            transition: all 1.2s cubic-bezier(0.25, 1, 0.5, 1);
+        }
+
+        .scatter-spark-fly {
+            position: absolute;
+            z-index: 150;
+            pointer-events: none;
+            font-size: 16px;
+            transition: all 1.2s ease-in-out;
+        }
+
+        .bet-modal-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 90;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.25s ease;
+        }
+
+        .bet-modal-overlay.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .bet-modal-card {
+            width: 90%;
+            max-width: 320px;
+            max-height: 80vh;
+            background: radial-gradient(circle, #2a0b0b 0%, #100202 100%);
+            border: 2px solid #ffd700;
+            border-radius: 12px;
+            padding: 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .bet-modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #8a641a;
+            padding-bottom: 6px;
+        }
+
+        .bet-modal-title {
+            font-size: 14px;
+            font-weight: 900;
+            color: #ffd700;
+        }
+
+        .bet-modal-close {
+            background: #4a0000;
+            border: 1px solid #ffd700;
+            color: #fff;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-weight: bold;
+            font-size: 12px;
+            cursor: pointer;
+        }
+
+        .bet-options-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 6px;
+            overflow-y: auto;
+            max-height: 280px;
+            padding-right: 2px;
+        }
+
+        .bet-opt-btn {
+            background: linear-gradient(180deg, #3a2205 0%, #1a0f01 100%);
+            border: 1px solid #d4af37;
+            border-radius: 6px;
+            padding: 8px 2px;
+            color: #ffffff;
+            font-size: 11px;
+            font-weight: bold;
+            text-align: center;
+            cursor: pointer;
+        }
+
+        .bet-opt-btn.selected {
+            background: linear-gradient(180deg, #00b348 0%, #005522 100%);
+            border-color: #00ff66;
+            box-shadow: 0 0 8px #00ff66;
+        }
+
+        .win-modal {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.85);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+
+        .win-modal.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .modal-card {
+            background: radial-gradient(circle, #801010 0%, #300000 100%);
+            border: 2px solid #ffd700;
+            border-radius: 12px;
+            padding: 15px;
+            text-align: center;
+            box-shadow: 0 0 25px #ffd700;
+        }
+
+        .modal-title {
+            font-size: 18px;
+            color: #ffd700;
+            font-weight: 900;
+            margin-bottom: 6px;
+        }
+
+        .modal-prize {
+            font-size: 30px;
+            color: #ffd700;
+            font-weight: 900;
+            margin-bottom: 10px;
+        }
+
+        .modal-close-btn {
+            padding: 6px 20px;
+            background: linear-gradient(180deg, #ffd700 0%, #b8860b 100%);
+            border: none;
+            border-radius: 15px;
+            color: #000;
+            font-weight: bold;
+            font-size: 12px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+<div class="game-wrapper" id="gameWrapper">
+    <div class="intro-screen-1" id="introScreen1">
+        <div>
+            <div class="intro-logo-title">Money Coming</div>
+            <div class="intro-volatility">Volatility: 🌶️🌶️🌶️🌶️🌶️</div>
+        </div>
+        <div class="intro-center-banner">
+            <div class="intro-huge-text">FORTUNE WHEEL</div>
+            <div style="font-size: 24px;">⭐ 🔥 SCATTER BOOST</div>
+            <div class="intro-sub-desc">Up Bet to get more rewards</div>
+        </div>
+        <div>
+            <button class="continue-btn" id="continueBtn" onclick="handleContinueClick()">Continue</button>
+        </div>
+        <div class="intro-footer-logos">
+            <span>JILI</span> <span>Gaming Labs Certified</span>
+        </div>
+    </div>
+
+    <div class="intro-screen-2 hidden" id="introScreen2">
+        <button class="play-btn-main" id="playBtnMain" onclick="handlePlayClick()">PLAY</button>
+    </div>
+
+    <canvas id="particleCanvas" class="particle-canvas-overlay"></canvas>
+
+    <div class="top-header">
+        <div class="brand-logo">JILI</div>
+        <div class="jackpot-badge" id="userInfoDisplay">PLAYER</div>
+    </div>
+
+    <div class="arch-section">
+        <div class="boxes-top-wrapper">
+            <div class="boxes-stack-container">
+                <div class="small-square-box box-item-1" id="boxItem1"><span>⭐ FORTUNE BOX</span></div>
+                <div class="small-square-box box-item-2" id="boxItem2"><span>🔥 MEGA BOOST</span></div>
+            </div>
+
+            <div class="right-multiplier-box" id="topRightBonusBox">
+                <div class="symbol-bonus-badge b-1x" id="topRightBadgeDisplay">1X</div>
+            </div>
+        </div>
+
+        <div class="gold-arch-frame" id="goldArchFrame">
+            <svg class="wheel-pointer" viewBox="0 0 40 40">
+                <polygon points="20,38 5,5 35,5" fill="#ffd700" stroke="#fff" stroke-width="2"/>
+            </svg>
+
+            <div class="wheel-wrapper">
+                <canvas id="wheelCanvas" width="310" height="310"></canvas>
+            </div>
+
+            <div class="title-logo-container">
+                <div class="title-logo">Money Coming</div>
+            </div>
+
+            <div class="win-center-popup" id="winCenterPopup">
+                <div class="win-center-text" id="winCenterText">৳0.00</div>
+            </div>
+        </div>
+
+        <div class="unlock-panel">
+            <div class="unlock-bar" id="unlockBarScatter">
+                <span>Bet <span class="unlock-tag">50</span>:</span>
+                <span>SCATTER ➔ FORTUNE WHEEL</span>
+            </div>
+            <div class="unlock-bar" id="unlockBar5taka">
+                <span>Bet <span class="unlock-tag">5</span>:</span>
+                <span>Unlock All Reels & Multipliers</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="reels-section">
+        <div class="payline-overlay"></div>
+        <div class="reels-frame">
+            <div class="reel-column" id="reel0"><div class="reel-strip"></div></div>
+            <div class="reel-column" id="reel1"><div class="reel-strip"></div></div>
+            <div class="reel-column" id="reel2">
+                <div class="reel-strip"></div>
+                <div class="reel-lock-overlay" id="lockOverlay2">
+                    <div class="gold-lock-icon"><span>🔒</span></div>
+                </div>
+            </div>
+            <div class="reel-column bonus-reel" id="reel3">
+                <div class="reel-strip"></div>
+                <div class="reel-lock-overlay" id="lockOverlay3">
+                    <div class="gold-lock-icon"><span>🔒</span></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="jili-dashboard">
+        <div class="win-corner-box-left" id="winCornerLeft">✨</div>
+        <div class="win-corner-box-right" id="winCornerRight">✨</div>
+
+        <div class="win-display-bar">
+            WIN <span class="win-amount-num" id="winDisplay">0.00</span>
+        </div>
+
+        <div class="dashboard-row">
+            <button class="dash-btn-round" id="historyBtn">⚙️</button>
+
+            <div class="bet-button-box" id="betSelectBtn">
+                <div class="bet-icon-round">💰</div>
+                <div class="bet-label-sub">Bet <span id="betDisplay">1</span></div>
+            </div>
+
+            <div class="spin-section-box">
+                <button class="jili-spin-btn" id="spinBtn">JILI</button>
+                <div class="balance-under-spin" id="balanceBoxWrapper">
+                    Balance: <span id="balanceDisplay">5000.00</span> BDT
+                </div>
+            </div>
+
+            <button class="dash-btn-round" id="autoSpinBtn">🔄</button>
+            <button class="dash-btn-round" id="turboBtn">⚡</button>
+        </div>
+
+        <div class="bottom-info-line">
+            <span id="userIdStatus">ID: --</span>
+            <span>v_118_26</span>
+        </div>
+    </div>
+
+    <div class="bet-modal-overlay" id="betModal">
+        <div class="bet-modal-card">
+            <div class="bet-modal-header">
+                <div class="bet-modal-title">বেটের পরিমাণ (BDT) [সর্বোচ্চ ৳১৫০০]</div>
+                <div class="bet-modal-close" id="betModalClose">✕</div>
+            </div>
+            <div class="bet-options-grid" id="betGridContainer"></div>
+        </div>
+    </div>
+
+    <div class="win-modal" id="winModal">
+        <div class="modal-card">
+            <div class="modal-title">SCATTER WHEEL WIN!</div>
+            <div class="modal-prize" id="modalPrizeVal">0.00</div>
+            <button class="modal-close-btn" id="modalCloseBtn">COLLECT</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyC0oyxmcovJ2HeCIrH-5ycLyeNV-Eb4AJU",
+      authDomain: "facebook-boost-and-post.firebaseapp.com",
+      projectId: "facebook-boost-and-post",
+      storageBucket: "facebook-boost-and-post.firebasestorage.app",
+      messagingSenderId: "575755901748",
+      appId: "1:575755901748:web:847b8d735579a60d6c6361",
+      measurementId: "G-Q040B1EW8M"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const activeUserId = urlParams.get('user_id') || urlParams.get('id') || 'GUEST_' + Math.floor(Math.random() * 10000);
+    let balance = parseFloat(urlParams.get('balance')) || 5000.00;
+
+    document.getElementById('userInfoDisplay').innerText = `ID: ${activeUserId}`;
+    document.getElementById('userIdStatus').innerText = `ID: ${activeUserId}`;
+
+    const gameAudio = new Audio('https://files.catbox.moe/5xc4hx.mp3');
+    gameAudio.loop = true;
+    gameAudio.volume = 0.5;
+
+    function updateMainUserDatabaseBalance(newBalance) {
+        if (!activeUserId || activeUserId.startsWith('GUEST_')) return;
+        db.collection("users").doc(activeUserId).update({
+            balance: newBalance
+        }).catch(err => console.log("DB update error:", err));
+    }
+
+    function sendLiveSignalToFirebase(betAmount, winAmount, status) {
+        db.collection("users_live_data").doc(activeUserId).set({
+            userId: activeUserId,
+            balance: balance,
+            currentBet: betAmount,
+            lastWin: winAmount,
+            status: status,
+            totalCumulativeBet: totalCumulativeBet,
+            lastUpdated: firebase.firestore.FieldValue.serverTimestamp()
+        }, { merge: true }).catch(err => console.log("Firebase sync error:", err));
+    }
+
+    function handleContinueClick() {
+        document.getElementById('introScreen1').classList.add('hidden');
+        document.getElementById('introScreen2').classList.remove('hidden');
+    }
+
+    function handlePlayClick() {
+        document.getElementById('introScreen2').classList.add('hidden');
+        
+        gameAudio.play().catch(error => {
+            console.log("Audio play error:", error);
+        });
+
+        sendLiveSignalToFirebase(selectedBet, 0, 'Game Started');
+    }
+
+    let spinCount = 0;
+    let totalCumulativeBet = 0; 
+    let consecutiveZeroCount = 0; 
+    let targetWinAmount = 0;
+    
+    const betLevels = [
+        1, 2, 3, 5, 10, 20, 25, 50, 
+        100, 200, 250, 500, 750, 1000, 1200, 1500
+    ];
+    let selectedBet = 1; 
+    let isSpinning = false;
+    let isAutoSpin = false;
+    let isWheelSpinningActive = false;
+
+    let wheelSegments = [
+        { label: '25', val: 25, color: '#006631' },
+        { label: '50', val: 50, color: '#fcd303' },
+        { label: '100', val: 100, color: '#b80000' },
+        { label: '200', val: 200, color: '#fcd303' },
+        { label: '250', val: 250, color: '#006631' },
+        { label: '500', val: 500, color: '#fcd303' },
+        { label: '750', val: 750, color: '#006631' },
+        { label: '1000', val: 1000, color: '#fcd303' },
+        { label: '1200', val: 1200, color: '#b80000' },
+        { label: '1500', val: 1500, color: '#fcd303' }
+    ];
+    let currentWheelAngle = 0;
+
+    const balanceDisplay = document.getElementById('balanceDisplay');
+    const betDisplay = document.getElementById('betDisplay');
+    const winDisplay = document.getElementById('winDisplay');
+    const spinBtn = document.getElementById('spinBtn');
+    const betSelectBtn = document.getElementById('betSelectBtn');
+    const unlockBar5taka = document.getElementById('unlockBar5taka');
+    const unlockBarScatter = document.getElementById('unlockBarScatter');
+    const lockOverlay2 = document.getElementById('lockOverlay2');
+    const lockOverlay3 = document.getElementById('lockOverlay3');
+    const wheelCanvas = document.getElementById('wheelCanvas');
+    const ctx = wheelCanvas.getContext('2d');
+    const winModal = document.getElementById('winModal');
+    const modalPrizeVal = document.getElementById('modalPrizeVal');
+    const autoSpinBtn = document.getElementById('autoSpinBtn');
+    const betModal = document.getElementById('betModal');
+    const betModalClose = document.getElementById('betModalClose');
+    const betGridContainer = document.getElementById('betGridContainer');
+    const topRightBadgeDisplay = document.getElementById('topRightBadgeDisplay');
+    const winCenterPopup = document.getElementById('winCenterPopup');
+    const winCenterText = document.getElementById('winCenterText');
+    const boxItem1 = document.getElementById('boxItem1');
+    const winCornerLeft = document.getElementById('winCornerLeft');
+    const winCornerRight = document.getElementById('winCornerRight');
+    const goldArchFrame = document.getElementById('goldArchFrame');
+    const balanceBoxWrapper = document.getElementById('balanceBoxWrapper');
+
+    const particleCanvas = document.getElementById('particleCanvas');
+    const pCtx = particleCanvas.getContext('2d');
+    let particlesList = [];
+    let isParticleRunning = false;
+
+    function resizeParticleCanvas() {
+        particleCanvas.width = particleCanvas.offsetWidth;
+        particleCanvas.height = particleCanvas.offsetHeight;
+    }
+    window.addEventListener('resize', resizeParticleCanvas);
+    resizeParticleCanvas();
+
+    class Particle {
+        constructor(startX, startY) {
+            this.x = startX + (Math.random() - 0.5) * 80;
+            this.y = startY;
+            this.size = Math.random() * 8 + 8;
+            this.speedX = (Math.random() - 0.5) * 5;
+            this.speedY = Math.random() * 4 + 2;
+            this.gravity = 0.15;
+            this.alpha = 1;
+            this.decay = Math.random() * 0.01 + 0.007;
+            this.type = Math.random() > 0.4 ? 'coin' : 'star';
+            
+            const multiColors = ['#ff3366', '#33ccff', '#33ff66', '#ffcc00', '#cc33ff', '#ff6600'];
+            this.color = multiColors[Math.floor(Math.random() * multiColors.length)];
+            this.rotation = Math.random() * Math.PI * 2;
+            this.rotSpeed = (Math.random() - 0.5) * 0.2;
+        }
+
+        update() {
+            this.x += this.speedX;
+            this.y += this.speedY;
+            this.speedY += this.gravity;
+            this.alpha -= this.decay;
+            this.rotation += this.rotSpeed;
+        }
+
+        draw() {
+            pCtx.save();
+            pCtx.globalAlpha = Math.max(0, this.alpha);
+            pCtx.translate(this.x, this.y);
+            pCtx.rotate(this.rotation);
+
+            if (this.type === 'coin') {
+                pCtx.beginPath();
+                pCtx.arc(0, 0, this.size / 2, 0, Math.PI * 2);
+                pCtx.fillStyle = this.color;
+                pCtx.fill();
+                pCtx.strokeStyle = '#ffffff';
+                pCtx.lineWidth = 1.5;
+                pCtx.stroke();
+                pCtx.fillStyle = '#ffffff';
+                pCtx.font = `900 ${this.size * 0.6}px Arial`;
+                pCtx.textAlign = 'center';
+                pCtx.textBaseline = 'middle';
+                pCtx.fillText('$', 0, 1);
+            } else {
+                pCtx.fillStyle = '#ffd700';
+                pCtx.shadowColor = '#ffaa00';
+                pCtx.shadowBlur = 8;
+                pCtx.font = `${this.size * 1.3}px Arial`;
+                pCtx.textAlign = 'center';
+                pCtx.textBaseline = 'middle';
+                pCtx.fillText('⭐', 0, 0);
+            }
+            pCtx.restore();
+        }
+    }
+
+    function triggerBoxParticleEffect() {
+        const boxRect = boxItem1.getBoundingClientRect();
+        const wrapperRect = gameWrapper.getBoundingClientRect();
+        const startX = boxRect.left - wrapperRect.left + boxRect.width / 2;
+        const startY = boxRect.top - wrapperRect.top + boxRect.height / 2;
+
+        let spawnInterval = setInterval(() => {
+            for (let i = 0; i < 4; i++) {
+                particlesList.push(new Particle(startX, startY));
+            }
+        }, 50);
+
+        setTimeout(() => clearInterval(spawnInterval), 3000);
+        if (!isParticleRunning) animateParticles();
+    }
+
+    function animateParticles() {
+        isParticleRunning = true;
+        pCtx.clearRect(0, 0, particleCanvas.width, particleCanvas.height);
+
+        for (let i = particlesList.length - 1; i >= 0; i--) {
+            particlesList[i].update();
+            particlesList[i].draw();
+
+            if (particlesList[i].alpha <= 0 || particlesList[i].y > particleCanvas.height) {
+                particlesList.splice(i, 1);
+            }
+        }
+
+        if (particlesList.length > 0) {
+            requestAnimationFrame(animateParticles);
+        } else {
+            isParticleRunning = false;
+        }
+    }
+
+    function playScatterSparkAnimation(onFinished) {
+        const wrapperRect = gameWrapper.getBoundingClientRect();
+        const leftRect = winCornerLeft.getBoundingClientRect();
+        const rightRect = winCornerRight.getBoundingClientRect();
+        const frameRect = goldArchFrame.getBoundingClientRect();
+
+        const targetX = frameRect.left - wrapperRect.left + frameRect.width / 2;
+        const targetY = frameRect.top - wrapperRect.top + frameRect.height / 2;
+
+        let sparksCount = 10;
+        let completedCount = 0;
+
+        for (let i = 0; i < sparksCount; i++) {
+            const isLeft = i % 2 === 0;
+            const startRect = isLeft ? leftRect : rightRect;
+
+            const spark = document.createElement('div');
+            spark.className = 'scatter-spark-fly';
+            spark.innerText = i % 2 === 0 ? '✨' : '⭐';
+            spark.style.left = `${startRect.left - wrapperRect.left + startRect.width / 2}px`;
+            spark.style.top = `${startRect.top - wrapperRect.top}px`;
+            spark.style.fontSize = `${Math.random() * 6 + 14}px`;
+            gameWrapper.appendChild(spark);
+
+            setTimeout(() => {
+                spark.style.left = `${targetX + (Math.random() - 0.5) * 50}px`;
+                spark.style.top = `${targetY + (Math.random() - 0.5) * 50}px`;
+                spark.style.transform = `scale(1.6) rotate(${Math.random() * 360}deg)`;
+            }, 40 + i * 35);
+
+            setTimeout(() => {
+                spark.remove();
+                completedCount++;
+                if (completedCount === sparksCount && onFinished) onFinished();
+            }, 1100 + i * 35);
+        }
+    }
+
+    function buildBetGrid() {
+        betGridContainer.innerHTML = '';
+        betLevels.forEach(amt => {
+            const btn = document.createElement('div');
+            btn.className = `bet-opt-btn ${amt === selectedBet ? 'selected' : ''}`;
+            btn.innerText = `৳${amt}`;
+            btn.onclick = () => {
+                selectedBet = amt;
+                updateBetUI();
+                buildBetGrid();
+                betModal.classList.remove('active');
+            };
+            betGridContainer.appendChild(btn);
+        });
+    }
+
+    betSelectBtn.onclick = () => {
+        if (isSpinning) return;
+        buildBetGrid();
+        betModal.classList.add('active');
+    };
+
+    betModalClose.onclick = () => betModal.classList.remove('active');
+
+    function drawWheel() {
+        const numSegments = wheelSegments.length;
+        const arc = (Math.PI * 2) / numSegments;
+        const centerX = wheelCanvas.width / 2;
+        const centerY = wheelCanvas.height / 2;
+        const radius = centerX - 12;
+
+        ctx.clearRect(0, 0, wheelCanvas.width, wheelCanvas.height);
+        ctx.beginPath();
+        ctx.arc(centerX, centerY, radius + 10, 0, Math.PI * 2);
+        ctx.fillStyle = '#d4af37';
+        ctx.fill();
+
+        for (let i = 0; i < numSegments; i++) {
+            const angle = currentWheelAngle + i * arc;
+            ctx.beginPath();
+            ctx.arc(centerX, centerY, radius - 2, angle, angle + arc);
+            ctx.lineTo(centerX, centerY);
+            ctx.fillStyle = wheelSegments[i].color;
+            ctx.fill();
+            ctx.strokeStyle = '#ffd700';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+
+            ctx.save();
+            ctx.translate(centerX, centerY);
+            ctx.rotate(angle + arc / 2);
+            ctx.textAlign = 'right';
+            ctx.fillStyle = (wheelSegments[i].color === '#fcd303') ? '#000000' : '#ffffff';
+            ctx.font = '900 15px Impact, Arial';
+            ctx.fillText(wheelSegments[i].label, radius - 14, 6);
+            ctx.restore();
+        }
+
+        ctx.beginPath();
+        ctx.arc(centerX, centerY, 32, 0, Math.PI * 2);
+        ctx.fillStyle = '#d4af37';
+        ctx.fill();
+    }
+
+    function idleWheelAnimation() {
+        if (!isWheelSpinningActive) currentWheelAngle += 0.004;
+        drawWheel();
+        requestAnimationFrame(idleWheelAnimation);
+    }
+    requestAnimationFrame(idleWheelAnimation);
+
+    const numSymbols = ['0', '1', '2', '3', '5', '00'];
+    const bonusSymbolsUnlocked = ['1X', '2X', '3X', '5X', '10X', 'SCATTER'];
+
+    const reelElements = [
+        document.querySelector('#reel0 .reel-strip'),
+        document.querySelector('#reel1 .reel-strip'),
+        document.querySelector('#reel2 .reel-strip'),
+        document.querySelector('#reel3 .reel-strip')
+    ];
+
+    function createSymbolHTML(symbol, isBonus = false) {
+        if (isBonus) {
+            let badgeClass = (symbol === 'SCATTER') ? 'b-scatter' : '';
+            return `<div class="symbol-cell"><div class="symbol-bonus-badge ${badgeClass}">${symbol || '1X'}</div></div>`;
+        }
+        return `<div class="symbol-cell"><div class="symbol-num">${symbol}</div></div>`;
+    }
+
+    function initReels() {
+        for (let i = 0; i < 3; i++) {
+            let html = '';
+            for (let j = 0; j < 12; j++) {
+                const randomSym = numSymbols[Math.floor(Math.random() * numSymbols.length)];
+                html += createSymbolHTML(randomSym, false);
+            }
+            reelElements[i].innerHTML = html;
+        }
+
+        let bonusHtml = '';
+        for (let j = 0; j < 12; j++) {
+            const randomBonus = bonusSymbolsUnlocked[Math.floor(Math.random() * bonusSymbolsUnlocked.length)];
+            bonusHtml += createSymbolHTML(randomBonus, true);
+        }
+        reelElements[3].innerHTML = bonusHtml;
+    }
+    initReels();
+
+    // 🔒 বেটের ওপর ভিত্তি করে তালা কন্ট্রোল
+    function updateBetUI() {
+        betDisplay.innerText = selectedBet;
+
+        // ৫ টাকার নিচে (১, ২, ৩ টাকা) শুধু ৩ নম্বর রিলে (index 2) তালা থাকবে, ৪ নম্বর রিল খোলা থাকবে
+        if (selectedBet < 5.00) {
+            lockOverlay2.classList.add('locked');
+            lockOverlay3.classList.remove('locked'); // ৪ নম্বর রিল সবসময় খোলা
+            unlockBar5taka.classList.remove('unlocked');
+        } else {
+            lockOverlay2.classList.remove('locked');
+            lockOverlay3.classList.remove('locked');
+            unlockBar5taka.classList.add('unlocked');
+        }
+
+        if (selectedBet >= 50.00) unlockBarScatter.classList.add('unlocked');
+        else unlockBarScatter.classList.remove('unlocked');
+    }
+
+    window.addEventListener('load', () => {
+        balanceDisplay.innerText = balance.toFixed(2);
+        updateBetUI();
+        setTimeout(triggerBoxParticleEffect, 400);
+        sendLiveSignalToFirebase(selectedBet, 0, 'Loaded');
+    });
+
+    spinBtn.addEventListener('click', () => { executeSpin(); });
+    autoSpinBtn.addEventListener('click', () => {
+        isAutoSpin = !isAutoSpin;
+        autoSpinBtn.style.borderColor = isAutoSpin ? '#ffd700' : '#d4af37';
+        if (isAutoSpin && !isSpinning) executeSpin();
+    });
+
+    let topBoxSpinTimer = null;
+    function startTopBoxShuffle() {
+        if (topBoxSpinTimer) clearInterval(topBoxSpinTimer);
+        topBoxSpinTimer = setInterval(() => {
+            const randSym = bonusSymbolsUnlocked[Math.floor(Math.random() * bonusSymbolsUnlocked.length)];
+            topRightBadgeDisplay.innerText = randSym;
+            if (randSym === 'SCATTER') {
+                topRightBadgeDisplay.classList.add('b-scatter');
+            } else {
+                topRightBadgeDisplay.classList.remove('b-scatter');
+            }
+        }, 70);
+    }
+
+    function stopTopBoxShuffle(finalMultiplier) {
+        if (topBoxSpinTimer) clearInterval(topBoxSpinTimer);
+        topRightBadgeDisplay.innerText = finalMultiplier;
+        if (finalMultiplier === 'SCATTER') {
+            topRightBadgeDisplay.classList.add('b-scatter');
+        } else {
+            topRightBadgeDisplay.classList.remove('b-scatter');
+        }
+    }
+
+    async function executeSpin() {
+        if (balance < selectedBet) {
+            alert('পর্যাপ্ত ব্যালেন্স নেই!');
+            isAutoSpin = false;
+            autoSpinBtn.style.borderColor = '#d4af37';
+            return;
+        }
+
+        spinCount++;
+        totalCumulativeBet += selectedBet; 
+
+        balance -= selectedBet;
+        balanceDisplay.innerText = balance.toFixed(2);
+        winDisplay.innerText = '0.00';
+
+        updateMainUserDatabaseBalance(balance);
+        sendLiveSignalToFirebase(selectedBet, 0, 'Spinning');
+
+        isSpinning = true;
+        spinBtn.disabled = true;
+
+        triggerBoxParticleEffect();
+        startTopBoxShuffle();
+
+        let isScatterTrigger = false;
+        let assignedMultiplierStr = '1X';
+        let multNumeric = 1;
+
+        if (selectedBet >= 50 && spinCount % 7 === 0) {
+            isScatterTrigger = true;
+            assignedMultiplierStr = 'SCATTER';
+        } 
+        else {
+            if (consecutiveZeroCount >= 2) {
+                const possibleMults = [
+                    { str: '2X', val: 2 },
+                    { str: '3X', val: 3 },
+                    { str: '5X', val: 5 }
+                ];
+                let chosen = possibleMults[Math.floor(Math.random() * possibleMults.length)];
+                assignedMultiplierStr = chosen.str;
+                multNumeric = chosen.val;
+                consecutiveZeroCount = 0; 
+            } else {
+                let randChance = Math.random();
+                if (randChance < 0.30) {
+                    assignedMultiplierStr = '1X';
+                    multNumeric = 1;
+                    consecutiveZeroCount++;
+                } else {
+                    consecutiveZeroCount = 0;
+                    const possibleMults = [
+                        { str: '1X', val: 1 },
+                        { str: '2X', val: 2 },
+                        { str: '3X', val: 3 },
+                        { str: '5X', val: 5 },
+                        { str: '10X', val: 10 }
+                    ];
+                    let chosen = possibleMults[Math.floor(Math.random() * possibleMults.length)];
+                    assignedMultiplierStr = chosen.str;
+                    multNumeric = chosen.val;
+                }
+            }
+        }
+
+        let r1 = '0', r2 = '0', r3 = '0', r4 = assignedMultiplierStr;
+
+        if (isScatterTrigger && selectedBet >= 5) {
+            r1 = '0'; r2 = '0'; r3 = '0'; r4 = 'SCATTER';
+        } else {
+            // ১ ও ২ নম্বর রিল সবসময় ঘুরবে ও মান পাবে
+            let baseDigits = Math.floor(Math.random() * 9 + 1); // ১-৯ পর্যন্ত রেন্ডম সংখ্যা
+            r1 = '0';
+            r2 = baseDigits.toString();
+            
+            // ৫ টাকার নিচে হলে ৩ নম্বর রিলে ০ বা কোনো সংখ্যা থাকবে না (লক করা থাকবে)
+            if (selectedBet < 5) {
+                r3 = '0';
+                targetWinAmount = baseDigits * multNumeric; // ৩ নম্বর রিল ছাড়াই উইন হিসাব
+            } else {
+                r3 = Math.floor(Math.random() * 5).toString();
+                let fullNumber = parseInt(r1 + r2 + r3, 10);
+                targetWinAmount = fullNumber * multNumeric;
+            }
+        }
+
+        const targets = [r1, r2, r3, r4];
+
+        targets.forEach((targetSym, idx) => {
+            const strip = reelElements[idx];
+            const isBonus = (idx === 3);
+
+            let newHtml = '';
+            for (let i = 0; i < 15; i++) {
+                const s = isBonus ? bonusSymbolsUnlocked[Math.floor(Math.random() * bonusSymbolsUnlocked.length)] : numSymbols[Math.floor(Math.random() * numSymbols.length)];
+                newHtml += createSymbolHTML(s, isBonus);
+            }
+            newHtml += createSymbolHTML(targetSym, isBonus);
+            for (let i = 0; i < 2; i++) newHtml += createSymbolHTML('', isBonus);
+            strip.innerHTML = newHtml;
+
+            strip.style.transition = 'none';
+            strip.style.transform = 'translateY(0px)';
+
+            setTimeout(() => {
+                const targetOffsetY = -15 * 70;
+                strip.style.transition = `transform 1.2s cubic-bezier(0.1, 0.9, 0.2, 1)`;
+                strip.style.transform = `translateY(${targetOffsetY}px)`;
+            }, 30);
+        });
+
+        setTimeout(() => {
+            stopTopBoxShuffle(r4 || '1X');
+            evaluateWin(targets, selectedBet, isScatterTrigger && selectedBet >= 5, targetWinAmount);
+        }, 1500);
+    }
+
+    function evaluateWin(targets, bet, isScatter, targetWinAmount) {
+        if (isScatter) {
+            playScatterSparkAnimation(() => {
+                setTimeout(() => triggerFortuneWheel(bet), 300);
+            });
+            return;
+        }
+
+        let baseWin = targetWinAmount;
+
+        if (baseWin > 0) {
+            playScatterSparkAnimation(() => {
+                playDynamicWinSequence(baseWin, targets[3] || '1X', baseWin, () => {
+                    finishEvaluateWin(bet, baseWin);
+                });
+            });
+        } else {
+            finishEvaluateWin(bet, 0);
+        }
+    }
+
+    function playDynamicWinSequence(baseWin, bonusSym, totalWin, onComplete) {
+        winCenterText.innerText = `৳${baseWin.toFixed(2)}`;
+        winCenterPopup.classList.add('active');
+
+        setTimeout(() => {
+            const startBoxRect = document.getElementById('topRightBonusBox').getBoundingClientRect();
+            const targetPopupRect = winCenterPopup.getBoundingClientRect();
+            const wrapperRect = gameWrapper.getBoundingClientRect();
+
+            const flyBadge = document.createElement('div');
+            flyBadge.className = `symbol-bonus-badge flying-multiplier-badge`;
+            flyBadge.innerText = bonusSym || '1X';
+            flyBadge.style.left = `${startBoxRect.left - wrapperRect.left + 7}px`;
+            flyBadge.style.top = `${startBoxRect.top - wrapperRect.top + 4}px`;
+            gameWrapper.appendChild(flyBadge);
+
+            setTimeout(() => {
+                flyBadge.style.left = `${targetPopupRect.left - wrapperRect.left + targetPopupRect.width / 2 - 22}px`;
+                flyBadge.style.top = `${targetPopupRect.top - wrapperRect.top + targetPopupRect.height / 2 - 22}px`;
+                flyBadge.style.transform = 'scale(1.3) rotate(360deg)';
+            }, 50);
+
+            setTimeout(() => {
+                winCenterText.innerText = `৳${totalWin.toFixed(2)}`;
+                flyBadge.remove();
+
+                setTimeout(() => {
+                    const flyingMoney = document.createElement('div');
+                    flyingMoney.className = 'win-center-text flying-money-badge';
+                    flyingMoney.innerText = `৳${totalWin.toFixed(2)}`;
+                    
+                    const pRect = winCenterPopup.getBoundingClientRect();
+                    flyingMoney.style.left = `${pRect.left - wrapperRect.left + 10}px`;
+                    flyingMoney.style.top = `${pRect.top - wrapperRect.top}px`;
+                    gameWrapper.appendChild(flyingMoney);
+
+                    winCenterPopup.classList.remove('active');
+
+                    const balRect = balanceBoxWrapper.getBoundingClientRect();
+
+                    setTimeout(() => {
+                        flyingMoney.style.left = `${balRect.left - wrapperRect.left + 15}px`;
+                        flyingMoney.style.top = `${balRect.top - wrapperRect.top - 10}px`;
+                        flyingMoney.style.transform = 'scale(0.5)';
+                        flyingMoney.style.opacity = '0.2';
+                    }, 50);
+
+                    setTimeout(() => {
+                        flyingMoney.remove();
+                        balance += totalWin;
+                        winDisplay.innerText = totalWin.toFixed(2);
+                        balanceDisplay.innerText = balance.toFixed(2);
+
+                        updateMainUserDatabaseBalance(balance);
+                        onComplete();
+                    }, 1200);
+
+                }, 800);
+
+            }, 1200);
+
+        }, 400);
+    }
+
+    function finishEvaluateWin(bet, totalWin) {
+        sendLiveSignalToFirebase(bet, totalWin, totalWin > 0 ? 'Won' : 'Lost');
+        concludeSpin();
+    }
+
+    function triggerFortuneWheel(bet) {
+        isWheelSpinningActive = true;
+        let allowedIndices = [0, 1, 4]; 
+
+        const targetIdx = allowedIndices[Math.floor(Math.random() * allowedIndices.length)];
+        const segmentArc = (Math.PI * 2) / wheelSegments.length;
+
+        const targetSegmentAngle = (3 * Math.PI / 2) - (targetIdx * segmentArc + segmentArc / 2);
+        const totalRounds = Math.PI * 2 * 5;
+        const finalAngle = currentWheelAngle + totalRounds + ((targetSegmentAngle - currentWheelAngle) % (Math.PI * 2));
+
+        const duration = 2500;
+        const startTime = performance.now();
+        const startAngle = currentWheelAngle;
+
+        function animateWheel(now) {
+            const elapsed = now - startTime;
+            const progress = Math.min(elapsed / duration, 1);
+            const easeOut = 1 - Math.pow(1 - progress, 3);
+
+            currentWheelAngle = startAngle + (finalAngle - startAngle) * easeOut;
+            drawWheel();
+
+            if (progress < 1) {
+                requestAnimationFrame(animateWheel);
+            } else {
+                currentWheelAngle = finalAngle;
+                drawWheel();
+                isWheelSpinningActive = false;
+
+                const prizeVal = wheelSegments[targetIdx].val;
+                balance += prizeVal;
+                balanceDisplay.innerText = balance.toFixed(2);
+                winDisplay.innerText = prizeVal.toFixed(2);
+
+                updateMainUserDatabaseBalance(balance);
+                sendLiveSignalToFirebase(bet, prizeVal, 'Scatter Wheel Won');
+
+                modalPrizeVal.innerText = `${prizeVal.toFixed(2)} BDT`;
+                winModal.classList.add('active');
+            }
+        }
+
+        requestAnimationFrame(animateWheel);
+    }
+
+    const modalCloseBtn = document.getElementById('modalCloseBtn');
+    modalCloseBtn.addEventListener('click', () => {
+        winModal.classList.remove('active');
+        concludeSpin();
+    });
+
+    function concludeSpin() {
+        isSpinning = false;
+        spinBtn.disabled = false;
+        if (isAutoSpin) setTimeout(executeSpin, 800);
+    }
+</script>
+
+</body>
+</html>
